@@ -1,0 +1,15 @@
+# created by virtualenv automatically
+/__pycache__/*
+*.o
+*.e
+*.out
+job/
+exp/
+scale_generalization/
+.vscode/
+
+
+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
+[user]
+	name = taohan10200
+	email = hantao10200@gmail.com
