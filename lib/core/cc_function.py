@@ -371,6 +371,36 @@ def test_cc(config, test_dataset, testloader, model
 
     return  mae, mse, nae,save_count_txt
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+config: phần cấu hình dạng OBJECT (ví dụ: )
+test_dataset: chưa dùng
+testloader: hỗ trợ bởi torch.utils.data
+model: model dự đoán
+
+mean: test_dataset.mean
+std: test_dataset.std
+
+sv_dir: thự mục lưu trữ kết quả sau xử lý
+sv_pred: true -> mong muốn lưu kết quả dự đoán
+
+logger: object ghi log
+loc_gt: true -> mong muốn lưu kết quả dự đoán
+'''
 def test_loc(config, test_dataset, testloader, model
             ,mean, std, sv_dir='', sv_pred=False,logger=None,loc_gt=None):
 
@@ -378,7 +408,7 @@ def test_loc(config, test_dataset, testloader, model
     device = torch.cuda.current_device()
     cnt_errors = {'mae': AverageMeter(), 'mse': AverageMeter(), 'nae': AverageMeter()}
     num_classes = 6
-    max_dist_thresh = 100
+    max_dist_thresh = 100       # max_dist_thresh có thể đề cập đến ngưỡng (threshold) tối đa cho khoảng cách giữa các điểm dữ liệu (data points) khi thực hiện các tác vụ như phân loại, gom cụm (clustering), hoặc tìm kiếm điểm gần nhất (nearest neighbors).
     metrics_s = {'tp': AverageMeter(), 'fp': AverageMeter(), 'fn': AverageMeter(), 'tp_c': AverageCategoryMeter(num_classes),
                  'fn_c': AverageCategoryMeter(num_classes)}
     metrics_l = {'tp': AverageMeter(), 'fp': AverageMeter(), 'fn': AverageMeter(), 'tp_c': AverageCategoryMeter(num_classes),
@@ -387,6 +417,16 @@ def test_loc(config, test_dataset, testloader, model
     loc_100_metrics = {'tp_100': AverageCategoryMeter(max_dist_thresh), 'fp_100': AverageCategoryMeter(max_dist_thresh), 'fn_100': AverageCategoryMeter(max_dist_thresh)}
 
     MLE_metric = AverageMeter()
+    
+    
+    # Trong PyTorch, mọi phép toán đều được theo dõi 
+    # để tính toán đạo hàm và cập nhật trọng số trong quá trình lan truyền ngược (backpropagation) khi huấn luyện mô hình. 
+    # Tuy nhiên, có những trường hợp bạn muốn tắt tính toán đạo hàm và không cập nhật trọng số, 
+    # chẳng hạn như khi đánh giá mô hình trên tập dữ liệu kiểm thử.
+    
+    
+    # torch.no_grad():, nó sẽ tắt việc theo dõi các phép toán và không lưu trữ thông tin đạo hàm. 
+    # Điều này giúp tăng tốc tính toán và giảm bộ nhớ được sử dụng, đặc biệt là khi bạn chỉ đang thực hiện dự đoán và không cần cập nhật trọng số.
     with torch.no_grad():
         for index, batch in enumerate(tqdm(testloader)):
             image, label, size_factor, name = batch
@@ -400,6 +440,10 @@ def test_loc(config, test_dataset, testloader, model
             b, c, h, w = image.size()
 
             result = model(image, label, 'val')
+            # density map xuất hiện chỉ khi qua model
+            
+            
+            
             # result = patch_forward(model, image, label,
             #                        config.test.patch_batch_size, mode='val')
             # import pdb
@@ -489,12 +533,38 @@ def test_loc(config, test_dataset, testloader, model
 
             image = image[0]
             if sv_pred:
-                for t, m, s in zip(image, mean, std):
+                # print(zip(image, mean, std))      
+                for t, m, s in zip(image, mean, std):           # zip để kết hợp tạo thành (t, m ,s)
                     t.mul_(s).add_(m)
-
+                # print(zip(image, mean, std))
+                    
+                # trọng tâm
                 save_results_more(name, sv_dir, image.cpu().data, \
                                   pre_den[0].detach().cpu(), gt_den[0].detach().cpu(),pred_cnt,gt_count,
                                   pred_data['points'],gt_data['points']*size_factor.numpy() )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         # confusion_matrix = torch.from_numpy(confusion_matrix).to(device)
         # reduced_confusion_matrix = reduce_tensor(confusion_matrix)
@@ -564,6 +634,21 @@ def test_loc(config, test_dataset, testloader, model
             #
 
     return  mae, mse, nae
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def test(config, test_dataset, testloader, model, 
         sv_dir='', sv_pred=True):

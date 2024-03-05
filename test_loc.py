@@ -117,10 +117,9 @@ def main():
                                         'final_state.pth')
     logger.info('=> loading model from {}'.format(model_state_file))
 
+    # bắt đầu load model
     pretrained_dict = torch.load(model_state_file)
-
     model.load_state_dict(pretrained_dict,strict=False)
-
     model = model.to(device)
 
     # prepare data
@@ -140,7 +139,9 @@ def main():
         num_workers=8,  # config.WORKERS,
         pin_memory=True)
 
+    # format lưu log vào thư mục
     loc_gt = read_box_gt(os.path.join(config.dataset.root, config.dataset.loc_gt))
+
 
     start = timeit.default_timer()
 

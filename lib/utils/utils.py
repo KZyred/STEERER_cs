@@ -209,6 +209,23 @@ import cv2
 from PIL import Image
 import torch.nn.functional as F
 
+
+
+
+
+
+
+'''
+iter: tên thư mục lưu
+exp_path: đường dẫn mở rộng lưu thư mục
+img0: ảnh đầu ra sau khi qua cpu xử lý : image.cpu().data
+pre_map0: nội suy map ...
+gt_map0: nội suy map ground truth
+pre_cnt: lượng suy luận dự đoán qua mô hình
+gt_cnt: lượng thực tế
+pre_points: các điểm dự đoán (màu xanh)
+gt_points: các điểm thực tế (màu đỏ)
+'''
 def save_results_more(iter, exp_path,img0, pre_map0,gt_map0,pre_cnt, gt_cnt, pre_points=None,gt_points=None):  # , flow):
     # gt_cnt = gt_map0.sum().item()
     # pre_cnt = pre_map0.sum().item()
@@ -249,26 +266,31 @@ def save_results_more(iter, exp_path,img0, pre_map0,gt_map0,pre_cnt, gt_cnt, pre
             point = point.astype(np.int32)
             point = (point[0], point[1])
             cv2.drawMarker(pil_input0, point, RGB_G, markerType=cv2.MARKER_CROSS,markerSize=15,thickness=3)
-            cv2.circle(pred_color_map, point,2, BGR_R,thickness)
+            cv2.circle(pred_color_map, point,2, BGR_R,thickness)  # ảnh dự đoán
             # cv2.drawMarker(pil_input0, point, RGB_R, markerType=cv2.MARKER,markerSize=20,thickness=3)
 
     if gt_points is not None:
         for i, point in enumerate(gt_points, 0):
             point = point.astype(np.int32)
             point = (point[0], point[1])
-            cv2.circle(pil_input0, point,4, RGB_R,thickness)
+            cv2.circle(pil_input0, point,4, RGB_R,thickness) # ảnh đầu vào
 
 
     cv2.putText(gt_color_map, 'GT:'+str(gt_cnt), (100,150), cv2.FONT_HERSHEY_SIMPLEX,
                 5, (255,255,255),thickness=4)
     cv2.putText(pred_color_map, 'Pre:'+str(round(pre_cnt,1)), (100, 150),cv2.FONT_HERSHEY_SIMPLEX,
                 5, (255,255,255), thickness=4)
+    
     pil_input0 = Image.fromarray(pil_input0)
-
     pil_label0 = Image.fromarray(cv2.cvtColor(gt_color_map, cv2.COLOR_BGR2RGB))
     pil_output0 = Image.fromarray(cv2.cvtColor(pred_color_map, cv2.COLOR_BGR2RGB))
 
-    imgs = [pil_input0, pil_label0, pil_output0]
+    # 3 ảnh sát nhau
+    # pil_input0: ảnh gốc
+    # pil_label0: ảnh GT
+    # pil_output0: ảnh Pre
+    
+    imgs = [pil_input0, pil_label0, pil_output0]     
 
     w_num , h_num=1, 3
 
@@ -285,6 +307,22 @@ def save_results_more(iter, exp_path,img0, pre_map0,gt_map0,pre_cnt, gt_cnt, pre
     # pdb.set_trace()
     target.save(os.path.join(exp_path,'{}_den.jpg'.format(iter)))
         # cv2.imwrite('./exp/{}_vis_.png'.format(iter), img)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 def vis_results(exp_name, writer, img, pred_map, gt_map, binar_map, thresholds, boxes, steps):  # , flow):
 
     pil_to_tensor = standard_transforms.ToTensor()

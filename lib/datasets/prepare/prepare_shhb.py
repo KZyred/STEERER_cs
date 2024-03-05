@@ -385,10 +385,11 @@ def loc_gt_make(  mode = 'test'):
             Box_Info.append(str(infor['human_num']))
             for id, head in enumerate(infor['boxes']):
                 x1, y1, x2, y2 = int(head[0]), int(head[1]), int(head[2]), int(head[3])
+                # tọa độ của 4 đỉnh
                 center_x, center_y, w, h = int((x1+x2)/2), int((y1+y2)/2),  int((x2-x1)),int((y2-y1)),
-                area = w * h
+                area = w * h    # diện tích khu vực chưa cái đầu
                 if area == 0:
-                    count += 1
+                    count += 1          # khu vực ko tạo lên diện tích ???
                     continue
 
                 level_area = 0

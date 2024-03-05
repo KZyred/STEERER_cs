@@ -26,7 +26,7 @@ network = dict(
 
 dataset = dict(
     name='SHHB',
-    root='../ProcessedData/SHHB/',
+    root='E:/tailieu/TaiLieuPhanMem/Python/Crowd_Counting/ProcessedData/SHHB/',
     test_set='test.txt',
     train_set='train.txt',
     loc_gt = 'test_gt_loc.txt',
